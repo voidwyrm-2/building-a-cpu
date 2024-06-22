@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "smc4", "smc4\smc4.csproj", "{06C98CA9-443F-4378-8AB1-CC8AAA10A699}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "basm", "basm\basm.csproj", "{C8C2A542-9DA6-451F-8877-E0F486523B74}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{06C98CA9-443F-4378-8AB1-CC8AAA10A699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06C98CA9-443F-4378-8AB1-CC8AAA10A699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06C98CA9-443F-4378-8AB1-CC8AAA10A699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06C98CA9-443F-4378-8AB1-CC8AAA10A699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8C2A542-9DA6-451F-8877-E0F486523B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8C2A542-9DA6-451F-8877-E0F486523B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8C2A542-9DA6-451F-8877-E0F486523B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8C2A542-9DA6-451F-8877-E0F486523B74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A069D80-4BEA-4EE5-B82F-6E8AC120522E}
+	EndGlobalSection
+EndGlobal
