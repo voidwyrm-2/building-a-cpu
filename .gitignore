@@ -438,3 +438,5 @@ Temporary Items
 **/.DS_Store
 **/obj/
 **/bin/
+
+**/test.py
