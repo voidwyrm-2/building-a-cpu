@@ -5,7 +5,7 @@ He wrote his assembler in Python, but I'm writing it in C# instead because I enj
 
 I can't find his video on the virtual CPU part so I'm just winging that part
 
-My CPU is called the Stupidly Made CPU 4-byte or the SMC-4<br>
+My CPU is called the Stupidly Made 4-byte CPU or the SMC-4<br>
 And my instruction set is called the Badly Made Assembly Instruction Set or BMAIS(buh-maze)
 
 #### License

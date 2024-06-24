@@ -21,7 +21,7 @@
                 return;
             }
 
-            RunByteCode(bytes, true, 2);
+            RunByteCode(bytes, printmode: 2);
         }
 
         static void RunByteCode(byte[] code, bool debug = false, byte printmode = 0)
@@ -32,14 +32,17 @@
                 return;
             }
 
-            byte[] registers = new byte[16];
-            byte[] memory = new byte[65536];
+            int[] registers = new int[16];
+
+            Stack<int> returnAddresses = [];
+
+            int[] memory = new int[65536];
+
 
             int pc = 0;
             while (pc < code.Length)
             {
-                if (debug) Console.WriteLine($"{pc}: {code[pc]}, {code[pc + 1]}, {code[pc + 2]}, {code[pc + 3]}");
-                bool shouldInc = true;
+                if (debug) Console.WriteLine($"(1) {pc}: {code[pc]}, {code[pc + 1]}, {code[pc + 2]}, {code[pc + 3]}");
                 int jumpAddress = (code[pc + 2] << 8) + (code[pc + 2] << 4) + code[pc + 3];
 
                 switch (code[pc])
@@ -86,10 +89,10 @@
 
                     // store and load
                     case 10:
-                        memory[code[pc + 2] << 4 + code[pc + 3]] = registers[code[pc + 1]];
+                        memory[(code[pc + 2] << 4) + code[pc + 3]] = registers[code[pc + 1]];
                         break;
                     case 11:
-                        registers[code[pc + 1]] = memory[code[pc + 2] << 4 + code[pc + 3]];
+                        registers[code[pc + 1]] = memory[(code[pc + 2] << 4) + code[pc + 3]];
                         break;
 
                     // cmp
@@ -153,13 +156,36 @@
                         }
                         break;
 
-                    // halt and noop
-                    case 0xFE:
-                        if (code[pc + 1] == 0xFE && code[pc + 2] == 0xFE && code[pc + 3] == 0xFE) return;
-                        Console.WriteLine($"error: unknown opcode '{code[pc]}'");
+                    // jal
+                    case 18:
+                        returnAddresses.Push(pc);
+                        pc = jumpAddress;
+                        continue;
+
+                    // ret
+                    case 253:
+                        if (code[pc + 1] != 253 || code[pc + 2] != 253 || code[pc + 3] != 253)
+                        {
+                            Console.WriteLine($"error: unknown opcode '{code[pc]}'");
+                            return;
+                        }
+                        if (returnAddresses.TryPop(out int ra))
+                        {
+                            pc = ra;
+                            break;
+                        }
+                        Console.WriteLine($"error: return address stack is empty");
                         return;
-                    case 0xFF:
-                        if (code[pc + 1] != 0xFF || code[pc + 2] != 0xFF || code[pc + 3] != 0xFF)
+
+                    // halt
+                    case 254:
+                        if (code[pc + 1] != 254 || code[pc + 2] != 254 || code[pc + 3] != 254) Console.WriteLine($"error: unknown opcode '{code[pc]}'");
+                        return;
+
+                    // labels and noop
+                    case 252:
+                    case 255:
+                        if (code[pc + 1] != code[pc] || code[pc + 2] != code[pc] || code[pc + 3] != code[pc])
                         {
                             Console.WriteLine($"error: unknown opcode '{code[pc]}'");
                             return;
@@ -171,14 +197,16 @@
                         return;
                 }
 
-                if (printmode == 2)
+                //if (debug) Console.WriteLine($"(2) {pc}: {code[pc]}, {code[pc + 1]}, {code[pc + 2]}, {code[pc + 3]}");
+
+                if (printmode == 3)
                 {
                     string registers_str = "";
                     foreach (var i in registers) registers_str += i.ToString() + " ";
                     Console.WriteLine("registers: " + registers_str.Trim());
                 }
 
-                if (shouldInc) pc += 4;
+                pc += 4;
             }
 
             if (printmode == 1)
@@ -190,6 +218,12 @@
                 string memory_str = "";
                 foreach (var i in memory) memory_str += i.ToString() + " ";
                 Console.WriteLine("memory: " + memory_str.Trim());
+            }
+            else if (printmode == 2)
+            {
+                string registers_str = "";
+                foreach (var i in registers) registers_str += i.ToString() + " ";
+                Console.WriteLine("registers: " + registers_str.Trim());
             }
         }
     }

@@ -65,7 +65,7 @@
 
         private static AssemblerResult Assemble(string text)
         {
-            const int maxRegisters = 16;
+            const int maxRegisters = 32;
 
             Dictionary<string, byte> instructions = [];
             string?[][] ilist = [
@@ -87,8 +87,10 @@
                 ["jne"],
                 ["jlt"],
                 ["jgt"],
-                ["halt", "0xFE"],
-                ["noop", "0xFF"]
+                ["jal"],
+                ["ret", "253"],
+                ["halt", "254"],
+                ["noop", "255"]
             ];
             if (ilist.Length > byte.MaxValue) throw new NotImplementedException();
 
@@ -98,7 +100,7 @@
                 if (a.Length > 1)
                 {
 #pragma warning disable CS8604
-                    instructions[a[0]] = Convert.ToByte(a[1], 16);
+                    instructions[a[0]] = Convert.ToByte(a[1]);
 #pragma warning restore CS8604
                 }
                 else
@@ -124,13 +126,18 @@
 
             static AssemblerResult GetRegister(string reg, int ln)
             {
-                if (reg.Equals("zero", StringComparison.CurrentCultureIgnoreCase))
+                switch (reg.ToLower())
                 {
-                    return new AssemblerResult([0], []);
-                }
-                else if (reg.Equals("comp", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return new AssemblerResult([1], []);
+                    case "zero":
+                        return new AssemblerResult([0], []);
+                    case "comp":
+                        return new AssemblerResult([1], []);
+                    case "cc":
+                        return new AssemblerResult([2], []);
+                    //case "ra":
+                    //    return new AssemblerResult([3], []);
+                    default:
+                        break;
                 }
 
                 byte convertedReg;
@@ -178,19 +185,24 @@
                 return new AssemblerResult([(byte)(convertedAddr >> 8), (byte)(convertedAddr & 0xFF)], []);
             }
 
+            int parserEmptyLines = 0;
             for (int ln = 0; ln < lines.Length; ln++)
             {
                 string l = lines[ln].Split(';')[0].Trim();
 
-                if (l.Length == 0) continue;
+                if (l.Length == 0)
+                {
+                    parserEmptyLines++;
+                    continue;
+                }
 
                 if (l[0] == '.')
                 {
                     string labelName = l[1..].Trim();
                     if (labelName == "") return new AssemblerResult([], [], NewError($"label names cannot be empty", ln));
                     if (labels.ContainsKey(labelName)) return new AssemblerResult([], [], NewError($"label '{labelName}' already exists", ln));
-                    labels.Add(labelName, ln * 4);
-                    ignoredLines[ln] = 2;
+                    labels.Add(labelName, (ln - parserEmptyLines) * 4);
+                    ignoredLines[ln] = 3;
                 }
             }
 
@@ -202,7 +214,11 @@
                 {
                     if (ignoredLines[ln] == 2)
                     {
-                        for (int i = 0; i < 4; i++) { bytes.Add(0xFF); }
+                        for (int i = 0; i < 4; i++) { bytes.Add(255); }
+                    }
+                    else if (ignoredLines[ln] == 3)
+                    {
+                        for (int i = 0; i < 4; i++) { bytes.Add(252); }
                     }
                     continue;
                 }
@@ -307,6 +323,7 @@
                     case "jne":
                     case "jlt":
                     case "jgt":
+                    case "jal":
                         if (s.Length != 2) return new AssemblerResult([], [], NewError($"expected '{s[0].ToLower()} [immediate | label]'", ln));
 
                         uint convertedImm;
@@ -335,13 +352,22 @@
                         bytes.Add((byte)(convertedImm & 0xFF));
                         break;
 
+                    case "ret":
                     case "halt":
-                        if (s.Length != 1) return new AssemblerResult([], [], NewError($"expected '{s[0].ToLower()}'", ln));
-                        for (int i = 0; i < 3; i++) { bytes.Add(0xFE); }
-                        break;
                     case "noop":
                         if (s.Length != 1) return new AssemblerResult([], [], NewError($"expected '{s[0].ToLower()}'", ln));
-                        for (int i = 0; i < 3; i++) { bytes.Add(0xFF); }
+                        switch (s[0].ToLower())
+                        {
+                            case "ret":
+                                for (int i = 0; i < 3; i++) { bytes.Add(253); }
+                                break;
+                            case "halt":
+                                for (int i = 0; i < 3; i++) { bytes.Add(254); }
+                                break;
+                            default:
+                                for (int i = 0; i < 3; i++) { bytes.Add(255); }
+                                break;
+                        }
                         break;
                     default:
                         return new AssemblerResult([], [], NewError($"unknown instruction '{s[0]}'", ln));
