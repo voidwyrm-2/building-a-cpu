@@ -157,6 +157,13 @@
 
             static AssemblerResult GetImmediate(string imm, int ln)
             {
+                if (imm.Length > 0)
+                {
+                    if (imm[0] != '$')
+                        return new AssemblerResult([], [], NewError($"missing '$' for immediate '{imm}'", ln));
+
+                }
+
                 byte convertedImm;
                 try
                 {

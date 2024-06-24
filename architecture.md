@@ -27,9 +27,10 @@ JEQ [immediate \| label] | 14 | 0x00-0xFF | 0x00-0xFF | 0x00-0xFF | `if (registe
 JNE [immediate \| label] | 15 | 0x00-0xFF | 0x00-0xFF | 0x00-0xFF | `if (registers[1] == 2) pc = [immediate \| label]`
 JLT [immediate \| label] | 16 | 0x00-0xFF | 0x00-0xFF | 0x00-0xFF | `if (registers[1] == 3) pc = [immediate \| label]`
 JGT [immediate \| label] | 17 | 0x00-0xFF | 0x00-0xFF | 0x00-0xFF | `if (registers[1] == 4) pc = [immediate \| label]`
-JAL [immediate \| label] | 18 | 0x00-0xFF | 0x00-0xFF | 0x00-0xFF | `ra = pc; pc = [immediate \| label]`
+JAL [immediate \| label] | 18 | 0x00-0xFF | 0x00-0xFF | 0x00-0xFF | `ra.push(pc); pc = [immediate \| label]`
+CALL | 251 | 251 | 251 | 251 | `makes the CPU do things based on what register 2 is`
 LABEL | 252 | 252 | 252 | 252 |
-RET | 253 | 253 | 253 | 253 | `pc = ra; ra = -1`
+RET | 253 | 253 | 253 | 253 | `pc = ra.pop()`
 HALT | 254 | 254 | 254 | 254 | `stops the program`
 NOOP | 255 | 255 | 255 | 255 | `no operation`
 
@@ -37,7 +38,7 @@ NOOP | 255 | 255 | 255 | 255 | `no operation`
 ## Conventions
 Operations that put something into a register(with the exception of LOAD for symmetry with STORE) use the format `[op] [input1] [input2] [destination]`
 
-Register 0 is meant to be a 0 constant(but it's not actually hardcoded because I'm lazy) and can be accessed with either `0` or `zero`
+Register 0 is the 0 constant and any writes to it will be ignored, it can be accessed with either `0` or `zero`
 
 Register 1 is the register that the result of the CMP operation is put into, and is the register that the JMP operations check, it can be accessed with either `1` or `comp`
 

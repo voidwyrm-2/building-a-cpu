@@ -49,14 +49,17 @@
                 {
                     // add and addi
                     case 0:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(registers[code[pc + 1]] + registers[code[pc + 2]]);
                         break;
                     case 1:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(code[pc + 1] + registers[code[pc + 2]]);
                         break;
 
                     // sub and subi
                     case 2:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(registers[code[pc + 1]] - registers[code[pc + 2]]);
                         break;
                     case 3:
@@ -65,6 +68,7 @@
 
                     // and and andi
                     case 4:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(registers[code[pc + 1]] & registers[code[pc + 2]]);
                         break;
                     case 5:
@@ -73,17 +77,21 @@
 
                     // or and ori
                     case 6:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(registers[code[pc + 1]] | registers[code[pc + 2]]);
                         break;
                     case 7:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(code[pc + 1] | registers[code[pc + 2]]);
                         break;
 
                     // xor and xori
                     case 8:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(registers[code[pc + 1]] ^ registers[code[pc + 2]]);
                         break;
                     case 9:
+                        if (code[pc + 3] == 0) break;
                         registers[code[pc + 3]] = (byte)(code[pc + 1] ^ registers[code[pc + 2]]);
                         break;
 
@@ -92,6 +100,7 @@
                         memory[(code[pc + 2] << 4) + code[pc + 3]] = registers[code[pc + 1]];
                         break;
                     case 11:
+                        if (code[pc + 1] == 0) break;
                         registers[code[pc + 1]] = memory[(code[pc + 2] << 4) + code[pc + 3]];
                         break;
 
@@ -161,6 +170,20 @@
                         returnAddresses.Push(pc);
                         pc = jumpAddress;
                         continue;
+
+                    // call
+                    case 251:
+                        if (code[pc + 1] != 252 || code[pc + 2] != 252 || code[pc + 3] != 252)
+                        {
+                            Console.WriteLine($"error: unknown opcode '{code[pc]}'");
+                            return;
+                        }
+                        switch (registers[2])
+                        {
+                            default:
+                                Console.WriteLine($"error: unknown call code '{registers[2]}'");
+                                return;
+                        }
 
                     // ret
                     case 253:
