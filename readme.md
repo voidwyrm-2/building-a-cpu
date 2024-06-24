@@ -3,7 +3,7 @@ This is a project about building a virtual CPU with a custom instruction set bas
 
 He wrote his assembler in Python, but I'm writing it in C# instead because I enjoy C# and it'll be more stable and easier to continue work on than Python
 
-I can't find his video on the virtual CPU part so I'm just winging that part
+I can't find his video on the virtual CPU part so I'm just winging that
 
 My CPU is called the Stupidly Made 4-byte CPU or the SMC-4<br>
 And my instruction set is called the Badly Made Assembly Instruction Set or BMAIS(buh-maze)
